@@ -1,5 +1,9 @@
 <?php
-
+/**
+****** MODIFIED ******
+* This class is modified to add extra functionality.
+* A checkbox is added to force issue method to "Print".
+*/
 require_once('CRM/Core/Form.php');
 
 class CRM_Cdntaxreceipts_Form_ViewTaxReceipt extends CRM_Core_Form {
@@ -114,6 +118,9 @@ class CRM_Cdntaxreceipts_Form_ViewTaxReceipt extends CRM_Core_Form {
       $this->assign('isCancelled', 0);
     }
 
+    // Add checkbox to force issue method to "Print"
+    $this->add('checkbox', 'is_force_print', ts('Issue receipt by printing instead of email?', array('domain' => 'org.civicrm.cdntaxreceipts')));
+
     $buttons = array();
 
     $buttons[] = array(
@@ -166,6 +173,10 @@ class CRM_Cdntaxreceipts_Form_ViewTaxReceipt extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page', array('domain' => 'org.civicrm.cdntaxreceipts')));
     }
 
+    // Get params
+    $params = $this->controller->exportValues($this->_name);
+    $isForcePrint = $params['is_force_print'];
+    $forceMethod = null;
     $method = '';
 
     // load the contribution
@@ -208,8 +219,12 @@ class CRM_Cdntaxreceipts_Form_ViewTaxReceipt extends CRM_Core_Form {
         CRM_Core_Session::setStatus($statusMsg, '', 'error');
       }
       else {
-
-        list($result, $method, $pdf) = cdntaxreceipts_issueTaxReceipt( $contribution );
+        if( $isForcePrint ){
+          $forceMethod = 'print';
+        }
+        $collectedPdf = null;
+        list( $result, $method, $pdf ) = cdntaxreceipts_issueTaxReceipt( $contribution, $collectedPdf, false, $forceMethod );
+        
 
         if ($result == TRUE) {
           if ($method == 'email') {

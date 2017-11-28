@@ -45,5 +45,6 @@
     <li>{ts domain='org.civicrm.cdntaxreceipts'}Print receipts will be compiled into a file for download.  Please print and mail any receipts in this file.{/ts}</li>
   </ul>
   <p>{$form.is_preview.html} {$form.is_preview.label} {ts domain='org.civicrm.cdntaxreceipts'}(Generates receipts marked 'preview', but does not issue the receipts.  No logging or emails sent.){/ts}</p>
+  <p>{$form.is_force_print.html} {$form.is_force_print.label}</p>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

@@ -1,6 +1,11 @@
 <?php
 
 /**
+ ****** MODIFIED ******
+ * This class is modified to add extra functionality.
+ * A checkbox is added to force issue method to "Print".
+ * 
+ * 
  * This class provides the common functionality for issuing Aggregate Tax Receipts for
  * a group of Contribution ids.
  */
@@ -140,6 +145,9 @@ class CRM_Cdntaxreceipts_Task_IssueAggregateTaxReceipts extends CRM_Contribute_F
 
     $this->add('checkbox', 'is_preview', ts('Run in preview mode?', array('domain' => 'org.civicrm.cdntaxreceipts')));
 
+    // Add checkbox to force issue method to "Print"
+    $this->add('checkbox', 'is_force_print', ts('Issue receipt by printing instead of email?', array('domain' => 'org.civicrm.cdntaxreceipts')));
+
     $buttons = array(
       array(
         'type' => 'cancel',
@@ -158,7 +166,7 @@ class CRM_Cdntaxreceipts_Task_IssueAggregateTaxReceipts extends CRM_Contribute_F
 
   function setDefaultValues() {
     // TODO: Handle case where year -1 was not an option
-    return array('receipt_year' => 'issue_' . (date("Y") - 1),);
+    return array('receipt_year' => 'issue_' . (date("Y") - 1), 'is_force_print' => 1,);
   }
 
   /**
@@ -181,6 +189,7 @@ class CRM_Cdntaxreceipts_Task_IssueAggregateTaxReceipts extends CRM_Contribute_F
     if ( $year ) {
       $year = substr($year, strlen('issue_')); // e.g. issue_2012
     }
+    $isForcePrint = $params['is_force_print'];
 
     $previewMode = FALSE;
     if (isset($params['is_preview']) && $params['is_preview'] == 1 ) {
@@ -204,7 +213,7 @@ class CRM_Cdntaxreceipts_Task_IssueAggregateTaxReceipts extends CRM_Contribute_F
       }
 
       $contributions = $contribution_status['contributions'];
-      $method = $contribution_status['issue_method'];
+      $method = ($isForcePrint ? 'print' : $contribution_status['issue_method']);
 
       if ( empty($issuedOn) && count($contributions) > 0 ) {
         $ret = cdntaxreceipts_issueAggregateTaxReceipt($contact_id, $year, $contributions, $method,
