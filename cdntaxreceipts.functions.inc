@@ -106,7 +106,14 @@ function cdntaxreceipts_processTaxReceipt($receipt, &$collectedPdf = NULL, $mode
   
     $email_from = CRM_Core_BAO_Setting::getItem(CDNTAX_SETTINGS, 'email_from');
     $email_archive = CRM_Core_BAO_Setting::getItem(CDNTAX_SETTINGS, 'email_archive');
-  
+    
+      // form a mailParams array to pass to the CiviCRM mail utility
+    $attachment = array(
+      'fullPath' => $pdf_file,
+      'mime_type' => 'application/pdf',
+      'cleanName' => $user_friendly,
+    );
+
     $mailparams = array(
       'from' => $org_name . ' <' . $email_from . '> ',
       'toName' => $displayname,
@@ -145,7 +152,7 @@ function cdntaxreceipts_processTaxReceipt($receipt, &$collectedPdf = NULL, $mode
       }
     }
     
-    if ( $previewMode ) {
+    if ( isset($previewMode) && $previewMode ) {
       $ret = TRUE;
     }
     else {
@@ -168,6 +175,7 @@ function cdntaxreceipts_processTaxReceipt($receipt, &$collectedPdf = NULL, $mode
       // if not unset, cron will clean up the PDF file later on
       return array( $ret, 'print', $pdf_file );
     }
+  }
     
     /*
     ****** Comment out 1.4.0 code for now. Ideally we'll use 1.4.0 code here so the email is sent using CiviMail b/c we can setup mail templates. ******
@@ -659,7 +667,6 @@ function cdntaxreceipts_issueTaxReceipt($contribution, &$collectedPdf = NULL, $m
   //   returns 0 for existing but old data
   //   returns timestamp for new data
   $is_duplicate = empty($issued_on) ? 0 : 1;
-
 
   if ( $is_duplicate ) {
     // if this was issued as part of an annual receipt, then jump over to the Annual method

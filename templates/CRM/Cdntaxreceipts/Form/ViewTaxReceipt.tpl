@@ -76,6 +76,7 @@ cj(document).ready(
     {if $method eq 'email'}
       <p>{ts domain='org.civicrm.cdntaxreceipts'}The receipt will be sent automatically <strong>by email</strong> to the contributor
       ({$receiptEmail}).{/ts}</p>
+      <p>{$form.is_force_print.html} {$form.is_force_print.label}</p>
     {else}
       <p class='status-warning'>{ts domain='org.civicrm.cdntaxreceipts'}Please <strong>download and print</strong> the receipt that
       is generated. You will need to send a printed copy to the contributor.{/ts}</p>
